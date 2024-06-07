@@ -1,5 +1,5 @@
 {
-    "name": "ongom/dite",
+    "name": "ongom/dite-orm",
     "description": "A PHP ORM, for interacting with the different kind of relational database.",
     "type": "library",
     "license": "MIT",
