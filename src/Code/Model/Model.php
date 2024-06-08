@@ -24,6 +24,12 @@ class Model{
     private $second_table_to_join = '';
     private $join_result_string = '';
     private $result_by_id;
+    private  $passed_table_name ;
+
+    public function __construct($table = null)
+    {
+        $this->passed_table_name = $table;
+    }
 
     //organising some key variables into on object for static methods
     private static function maker($where_selector = [], $select = '*'){
@@ -307,30 +313,39 @@ class Model{
     // non static methods
     public function find(array $where_selector=[]){
         $maker = self::maker($where_selector);
+        //getting the table name for both Modal instanse ans the custom model extnding
+        $table_name = $this->passed_table_name?: $maker->table_name;
         $this->prepared_values = $maker->prepared_values;
-        $this->sql = "SELECT * FROM $maker->table_name $maker->where";
+        $this->sql = "SELECT * FROM $table_name $maker->where";
         //
-        $this->first_table_to_join = $maker->table_name;
+        $this->first_table_to_join = $table_name;
         $this->activate_find = true;
         return $this;
     }
     // non static methods for finding on result by its id
     public function findByPk(int|string $primary_key){
         $maker = self::maker($primary_key);
+        //getting the table name for both Modal instanse ans the custom model extnding
+        $table_name = $this->passed_table_name?: $maker->table_name;
+        $where = str_replace('dite\model\model_id', strtolower($table_name.'_id'), $maker->where);
         $this->id_for_one_record = $primary_key;
-        $sql = "SELECT * FROM $maker->table_name $maker->where LIMIT 1";
+        $sql = "SELECT * FROM $table_name $where LIMIT 1";
         // 
         $stmt = $maker->instance->connect()->prepare($sql);
         $stmt->execute($maker->prepared_values);
         // Fetch the records so we can display them in our template.
-        $this->result_by_id = $stmt->fetch($maker->instance->fetchMode());
+        $stm_result = $stmt->fetch($maker->instance->fetchMode());
+        $this->result_by_id = $stm_result?$stm_result:'null';
+        
         $maker->instance->debargPrint($sql, $maker->prepared_values, null, true);
         return $this;
     }
     // non static methods to paginate
     public function paginate(array $where_selector = []){
         $maker = self::maker($where_selector);
-        $this->sql = "SELECT * FROM $maker->table_name $maker->where";
+        //getting the table name for both Modal instanse ans the custom model extnding
+        $table_name = $this->passed_table_name?: $maker->table_name;
+        $this->sql = "SELECT * FROM $table_name $maker->where";
         //  
         $this->first_table_to_join = $maker->table_name;
         $this->activate_paginating = true;
@@ -344,7 +359,10 @@ class Model{
     //do join
     public function doJoin(string $second_table, $type_of_join = "INNER JOIN"){
         $maker = self::maker();
-        $this->called_class = $maker->table_name;
+        //getting the table name for both Modal instanse ans the custom model extnding
+        $table_name = $this->passed_table_name?: $maker->table_name;
+        // 
+        $this->called_class = $table_name;
         $this->first_table_to_join = $this->first_table_to_join?:$this->second_table_to_join;
         $this->second_table_to_join = $second_table;
         $this->join_result_string .= "$type_of_join $this->second_table_to_join ON $this->first_table_to_join.{$maker->builder->idColName($this->first_table_to_join)} = $this->second_table_to_join.{$maker->builder->idColName($this->first_table_to_join)} ";
@@ -442,8 +460,9 @@ class Model{
 
     // generate column names
     public function get(){
-        if($this->result_by_id){
-            return $this->result_by_id;
+        
+        if($this->result_by_id || $this->result_by_id == 'null'){
+            return false;
         }else{ 
             if($this->group_by){
                 $this->sql.= " GROUP BY $this->group_by ";
@@ -511,7 +530,8 @@ class Model{
                 }
             }
         $instance->debargPrint($this->sql, $this->prepared_values, null, true);
-        return !$results?[]:$results;
+
+        return !$results?false:$results;
     }  
     private function countTotal(string $sql){
         $maker = self::maker();
@@ -567,7 +587,6 @@ class Model{
     }
     //relationship for many to many function
     public function hasManyMany(string $ref_table, array $where_selector=[]){
-        $maker = self::maker();
         $maker = self::maker($where_selector);
         $where = str_replace("WHERE", "", $maker->where);
         $use_where = $where ? " AND $where ":null;

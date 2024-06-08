@@ -89,7 +89,7 @@ $user->age; //36
 Before any step you first need to autoload the outoload.php from vendor folder.
 
 ```php
-require_once "/path/to/vendor/autoload.php";
+require_once "path/to/vendor/autoload.php";
 ```
 Creating tables can be done in two ways.
 
@@ -113,7 +113,7 @@ Then the model classes(representing each table) are defined like below.
 ```php
 use Dite\Model\Model;
 
-require_once "/path/to/vendor/autoload.php";
+require_once "path/to/vendor/autoload.php";
 
 //users
 class Users extends Model{}
@@ -762,6 +762,15 @@ The above query will return something like below
   'data' = [...]; // records for each page
 ]
 ```
+
+### Using Model class to query data.
+Pass the name of the table to the model constrctor if you want to query using the Model class
+```php
+  $user_instant = new Model('users')
+  $users = $user_instant.find()->get()
+  $users = $user_instant.find()->select('name')->get()
+```
+You can chain any valid cmethod chain like select, join, group, etc.
 
 #### join().
 
