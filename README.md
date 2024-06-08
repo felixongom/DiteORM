@@ -113,7 +113,7 @@ Then the model classes(representing each table) are defined like below.
 ```php
 use Dite\Model\Model;
 
-require_once __DIR__."/path/to/vendor/autoload.php";
+require_once "/path/to/vendor/autoload.php";
 
 //users
 class Users extends Model{}
@@ -134,7 +134,7 @@ use Dite\Model\Model;
 use Dite\Table\Table;
 
 
-require_once __DIR__."path/to/vendor/autoload.php";
+require_once "path/to/vendor/autoload.php";
 //users
 class Users extends Model{
 
