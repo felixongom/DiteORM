@@ -770,7 +770,7 @@ Pass the name of the table to the model constrctor if you want to query using th
   $users = $user_instant.find()->get()
   $users = $user_instant.find()->select('name')->get()
 ```
-You can chain any valid cmethod chain like select, join, group, etc.
+You can chain any valid method chain like select, join, group, etc.
 
 #### join().
 
