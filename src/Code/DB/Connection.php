@@ -40,7 +40,7 @@ class Connection
                 $connected = new PDO("sqlsrv:Server=" . "$server_name;Database=$database_name", "$user_name", "$database_password");
                 $connected->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            }else if ($this->env['DBMS'] === 'postgresql' || $this->env['DBMS']===trim('pgsql')) {
+            }else if ($this->env['DBMS'] === 'postgresql' ||$this->env['DBMS']===trim('pgsql')) {
                 $server_name = $this->env['SERVER_NAME'];
                 $database_name = $this->env['DATABASE_NAME'];
                 $user_name = $this->env['USER_NAME'];
@@ -50,11 +50,7 @@ class Connection
                 $connected->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             }
-            if($this->runSchema() && $this->env()['RUN_SCHEMA'] === '1'){
-                return $connected;
-            }else{
-                return null;
-            }
+            return $connected;
         } catch (PDOException $e) {
             exit("Failed to connect to database!<br> {$e->getMessage()}");
         }
