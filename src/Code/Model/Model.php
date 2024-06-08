@@ -531,7 +531,7 @@ class Model{
             }
         $instance->debargPrint($this->sql, $this->prepared_values, null, true);
 
-        return !$results?false:$results;
+        return !$results?[]:$results;
     }  
     private function countTotal(string $sql){
         $maker = self::maker();
