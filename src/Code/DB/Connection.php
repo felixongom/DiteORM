@@ -16,7 +16,7 @@ class Connection
     {
         $connected = null;
         try {
-            if ($this->env['DBMS'] === 'mysql') {
+            if ($this->env['DRIVER'] === 'mysql') {
                 $server_name = $this->env['SERVER_NAME'];
                 $database_name = $this->env['DATABASE_NAME'];
                 $user_name = $this->env['USER_NAME'];
@@ -26,12 +26,12 @@ class Connection
                 $connected->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 //sqlite
-            } else if ($this->env['DBMS'] === 'sqlite') {
+            } else if ($this->env['DRIVER'] === 'sqlite') {
                 $databaseFile = $this->env['DATABASE_NAME'] . ".sqlite";
                 $connected = new PDO("sqlite:$databaseFile");
                 $connected->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            } else if ($this->env['DBMS'] === 'sqlserver') {
+            } else if ($this->env['DRIVER'] === 'sqlserver') {
                 $server_name = $this->env['SERVER_NAME'];
                 $database_name = $this->env['DATABASE_NAME'];
                 $user_name = $this->env['USER_NAME'];
@@ -40,7 +40,7 @@ class Connection
                 $connected = new PDO("sqlsrv:Server=" . "$server_name;Database=$database_name", "$user_name", "$database_password");
                 $connected->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            }else if ($this->env['DBMS'] === 'postgresql' || $this->env['DBMS']===trim('pgsql')) {
+            }else if ($this->env['DRIVER'] === 'postgresql' || $this->env['DRIVER']===trim('pgsql')) {
                 $server_name = $this->env['SERVER_NAME'];
                 $database_name = $this->env['DATABASE_NAME'];
                 $user_name = $this->env['USER_NAME'];
@@ -100,9 +100,9 @@ class Connection
     {
         $sql = null;
         $conn = $this->connect();
-        if ($this->env['DBMS'] === 'mysql') {
+        if ($this->env['DRIVER'] === 'mysql') {
             return false;
-        } elseif ($this->env['DBMS'] === 'sqlite') {
+        } elseif ($this->env['DRIVER'] === 'sqlite') {
             $sql = "PRAGMA table_info($table)";
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -115,7 +115,7 @@ class Connection
             }
         }
 
-        // if($this->env()['DBMS']==='sqlite') return $result;
+        // if($this->env()['DRIVER']==='sqlite') return $result;
         // if ($result['count'] > 0) {
         //     return true;
         // } else {

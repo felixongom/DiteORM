@@ -47,7 +47,7 @@ class Table{
     
     //An automatic primary key id
     public function id(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('postgresql') || $this->conn->env()['DBMS']===trim('pgsql');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('postgresql') || $this->conn->env()['DRIVER']===trim('pgsql');
         $_NAME = strtolower($this->table_name."_id");
         $INT = $sqlite_engeine?"SERIAL":"INT";
         $this->_id = "$_NAME $INT AUTO_INCREMENT PRIMARY KEY NOT NULL";
@@ -87,7 +87,7 @@ class Table{
             $result .="'$value'".$comma;
         }
         $Text  = null;
-        if($this->conn->env()['DBMS']===trim('sqlite')){
+        if($this->conn->env()['DRIVER']===trim('sqlite')){
             $Text = "_*_$name TEXT CHECK($name IN ($result) ) ";
         }else{
             $Text  = "_*_$name ENUM($result) ";
@@ -177,21 +177,21 @@ class Table{
     }
     //For cascade  on delete
     public function cascadeDelete(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON DELETE CASCADE ";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For cascade  on UPDATE
     public function cascadeUpdate(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON UPDATE CASCADE ";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For restrict
     public function restrict(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON DELETE RESTRICT ON UPDATE RESTRICT ";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
 
@@ -199,63 +199,63 @@ class Table{
     }
     //For restrict
     public function restrictDelete(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON DELETE RESTRICT ";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For restrict
     public function restrictUpdate(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON UPDATE RESTRICT ";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For set null
     public function setnull(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON DELETE SET NULL ON UPDATE SET NULL ";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For set null
     public function setnullDelete(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON DELETE SET NULL ";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For set null
     public function setnullUpdate(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON UPDATE SET NULL";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For set null
     public function noaction(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON DELETE NO ACTION ON UPDATE NO ACTION";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For set null
     public function noactionDelete(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON DELETE NO ACTION ";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //For set null
     public function noactionUpdate(){
-        $sqlite_engeine = $this->conn->env()['DBMS']===trim('sqlite');
+        $sqlite_engeine = $this->conn->env()['DRIVER']===trim('sqlite');
         $Text = " ON UPDATE NO ACTION";
         $sqlite_engeine?$this->BuildColumn->BuildRef($Text):$this->BuildColumn->Build($Text);
         return $this;
     }
     //Setting up timestamp
     public function timestamp(){
-        $sqlite_engeine = $this->conn->env()['DBMS'] ==='sqlite';
+        $sqlite_engeine = $this->conn->env()['DRIVER'] ==='sqlite';
         $auto_update = $sqlite_engeine==1?null:' ON UPDATE CURRENT_TIMESTAMP';
         $this->_timestamp  = ", created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP $auto_update";

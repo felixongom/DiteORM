@@ -28,18 +28,18 @@ To get started, create a .env file at the root of your project, this is where yo
 #### Setup for sqlite.
 
 ```php
-DBMS = sqlite
+DRIVER = sqlite
 DATABASE_NAME = schooldb
 RUN_SCHEMA = 1
 ```
-- **DBMS** is the type of database management system you are using. The is sqlite.
+- **DRIVER** is the type of database management system you are using. The is sqlite.
 - **DATABASE_NAME** is the name of the database you are using. The value is the name of your database like 'school_database'.
 
 #### Setup for mysql, sqlserver, postgre.
 
 First create the database example 'schooldb' then add the following code to the .env.
 ```php
-DBMS = mysql
+DRIVER = mysql
 DATABASE_NAME = schooldb
 SERVER_NAME = localhost
 USER_NAME = root
@@ -47,7 +47,7 @@ DATABASE_PASSWORD = 1234
 RUN_SCHEMA = 1
 ```
 
-- **DBMS** is the type of database management system you are using. List of posible values are;
+- **DRIVER** is the type of database management system you are using. List of posible values are;
   - sqlite
   - mysql
   - sqlsever 
@@ -319,7 +319,7 @@ $table->id();
   ```php
   $table->double('distances');
   ```
-- **decimal()** -Sql decimal datatype field. It take in field name. This may not be avilable in other dbms
+- **decimal()** -Sql decimal datatype field. It take in field name. This may not be avilable in other DRIVER
   ```php
   $table->decimal('distance');
   ```

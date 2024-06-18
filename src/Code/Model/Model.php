@@ -81,7 +81,7 @@ class Model{
         // Fetch the records so we can display them in our template.
         $results = $stmt->fetchAll($maker->instance->fetchMode());
         $maker->instance->debargPrint($sql, $maker->prepared_values, null, true);
-        return $results;
+        return $results??[];
     }
     //fetches one record by id
     public static function findById(int|string $where_selector, array|string $select = '*'){
@@ -105,7 +105,7 @@ class Model{
         // Fetch the records so we can display them in our template.
         $result = $stmt->fetch($maker->instance->fetchMode());
         $maker->instance->debargPrint($sql, $maker->prepared_values, null, true);
-        return $result?:[];
+        return $result;
     }
     //fetches the last record that matches the query
     public static function last(array $where_selector = [], array|string $select = '*'){
@@ -117,7 +117,7 @@ class Model{
         // Fetch the records so we can display them in our template.
         $result = $stmt->fetch($maker->instance->fetchMode());
         $maker->instance->debargPrint($sql, $maker->prepared_values, null, true);
-        return $result?:[];
+        return $result;
     }
     //fetches the first record that matches the query
     public static function first(array $where_selector = [], array|string $select = '*'){
@@ -129,7 +129,7 @@ class Model{
         // Fetch the records so we can display them in our template.
         $result = $stmt->fetch($maker->instance->fetchMode());
         $maker->instance->debargPrint($sql, $maker->prepared_values, null, true);
-        return $result?:[];
+        return $result;
     }
     //delete by id
     private static function doDelete(int|string|array $where_selector){
@@ -157,8 +157,8 @@ class Model{
     public static function deleteMany(array $where_selector):void{
         self::doDelete($where_selector);
      }
-    //delete many
-    public static function countRecords(array $where_selector = [], array|string $column = '*'){
+    //count records
+    public static function countRecords(array $where_selector = [], array|string $column = '*'):int{
         $maker = self::maker($where_selector);
         $sql = "SELECT COUNT($column) AS total FROM $maker->table_name $maker->where";
         // 
@@ -172,9 +172,7 @@ class Model{
 
     // ******************************************************************************************
     //creates new record
-    public function test(){
-        return "Tested";
-    }
+
      public static function create(array $data){
         if (count($data)==0) return;
         $instance = new Connection();
@@ -194,7 +192,7 @@ class Model{
     private static function addAndPersistsToDb(array $data, $instance){
         $table_name = get_called_class(); //table name
         $conn = $instance->connect();
-        $isSqlite = $instance->env()['DBMS'] === 'sqlite';
+        $isSqlite = $instance->env()['DRIVER'] === 'sqlite';
         $time_colmn_exist = $instance->includeTime($table_name, 'created_at'); //boolean
         $timestamp = $time_colmn_exist?'created_at, updated_at':null;
         $createdat_val = $time_colmn_exist?[date("Y-m-d h:i:s"), date("Y-m-d h:i:s")]:[];
@@ -216,7 +214,7 @@ class Model{
             $columns = strtolower($table_name.'_id, ').join(", ",array_keys($data));
             $SQL = "INSERT INTO $table_name ($columns) VALUES $qnmarks";
             $prepared_values = [$max_id, ...$values];
-        }else{//is other dbms and timestamp column exist
+        }else{//is other DRIVER and timestamp column exist
             $qnmarks = '('. str_repeat('?,', count($data) - 1).'?)'; //get question marks
             $columns = join(", ",array_keys($data));
             $SQL = "INSERT INTO $table_name ($columns) VALUES $qnmarks";
@@ -258,7 +256,7 @@ class Model{
         return $res;
     } 
     //updates records all the record
-     public static function update(int|string $where_selector, array $values_to_set){
+     public static function update(int|string $where_selector, array $values_to_set):array{
         return self::doUpdate($where_selector, $values_to_set);
     } 
     //updats records all the record
@@ -335,7 +333,7 @@ class Model{
         $stmt->execute($maker->prepared_values);
         // Fetch the records so we can display them in our template.
         $stm_result = $stmt->fetch($maker->instance->fetchMode());
-        $this->result_by_id = $stm_result?$stm_result:'null';
+        $this->result_by_id = $stm_result?:'null';
         
         $maker->instance->debargPrint($sql, $maker->prepared_values, null, true);
         return $this;
@@ -461,7 +459,7 @@ class Model{
     // generate column names
     public function get(){
         
-        if($this->result_by_id || $this->result_by_id == 'null'){
+        if($this->result_by_id || $this->result_by_id === 'null'){// it returns the array
             return false;
         }else{ 
             if($this->group_by){
@@ -478,18 +476,18 @@ class Model{
             // count the number before limiting pagination 
             $total_count = $this->countTotal(str_replace('*', "COUNT(*) AS total_count", $this->sql));
             // 
-            $dbms = self::maker()->instance->env()["DBMS"];
+            $DRIVER = self::maker()->instance->env()["DRIVER"];
             if($this->activate_paginating){
                 $this->skip = ($this->page-1)*$this->per_page;
                 $this->limit = $this->per_page;
 
-                if($dbms === "postgresql"){
+                if($DRIVER === "postgresql"){
                     $this->sql.= " LIMIT $this->skip OFFSET $this->per_page";
                 }else{
                     $this->sql.= " LIMIT $this->skip, $this->per_page";   
                 }
             }elseif($this->activate_find && $this->limit){
-                if($dbms === "postgresql"){
+                if($DRIVER === "postgresql"){
                     $this->sql.= " LIMIT $this->skip OFFSET $this->limit";
                 }else{
                     $this->sql.= " LIMIT $this->skip, $this->limit";   
@@ -533,7 +531,7 @@ class Model{
 
         return !$results?[]:$results;
     }  
-    private function countTotal(string $sql){
+    private function countTotal(string $sql):int{
         $maker = self::maker();
         $stmt = $maker->instance->connect()->prepare($sql);
         $stmt->execute($maker->prepared_values);
@@ -542,7 +540,7 @@ class Model{
         return $result->total_count;
     }
     //relationship has manay function
-    public function hasMany(string $ref_table, array $where_selector=[]){
+    public function hasMany(string $ref_table, array $where_selector=[]):array{
         $maker = self::maker($where_selector);
         $where = str_replace("WHERE", "", $maker->where);
         $use_where = $where ? " AND $where ":null;
@@ -556,11 +554,11 @@ class Model{
         // 
         $results = $stmt->fetchAll($maker->instance->fetchMode());
         $maker->instance->debargPrint($this->sql, [$this->id_for_one_record], null, true);
-        return $results;
+        return $results??[];
     }
     
     //relationship has one function
-    public function hasOne(string $ref_table){
+    public function hasOne(string $ref_table):array{
         $maker = self::maker();
         $parent_col = $maker->builder->idColName($maker->table_name);
         // 
@@ -570,10 +568,10 @@ class Model{
         $results = $stmt->fetch($maker->instance->fetchMode());
         // 
         $maker->instance->debargPrint($this->sql, [$this->id_for_one_record], null, true);
-        return $results;
+        return $results??[];
     }
     //relationship belongs to function
-    public function belongsToOne(string $ref_table){
+    public function belongsToOne(string $ref_table):array{
         $maker = self::maker();
         $ref_col = $maker->builder->idColName($ref_table);
         $this->sql = "SELECT * FROM $ref_table WHERE $ref_col = ? LIMIT 1";
@@ -583,10 +581,10 @@ class Model{
         // 
         $results = $stmt->fetch($maker->instance->fetchMode());
         $maker->instance->debargPrint($this->sql, [$this->id_for_one_record], null, true);
-        return $results;
+        return $results??[];
     }
     //relationship for many to many function
-    public function hasManyMany(string $ref_table, array $where_selector=[]){
+    public function hasManyMany(string $ref_table, array $where_selector=[]):array{
         $maker = self::maker($where_selector);
         $where = str_replace("WHERE", "", $maker->where);
         $use_where = $where ? " AND $where ":null;
@@ -604,6 +602,6 @@ class Model{
         $results = $stmt->fetchAll($maker->instance->fetchMode());
         // 
         $maker->instance->debargPrint($this->sql, [$this->id_for_one_record], null, true);
-        return $results;
+        return $results??[];
     }
  }
