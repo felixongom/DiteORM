@@ -108,7 +108,6 @@ Primary key field name is got from the name of the table written in lowercase. i
 
 Then the model classes(representing each table) are defined like below.
 
-***I will always asume you have required / downloaded the library using composer.***
 
 ```php
 use Dite\Model\Model;
@@ -130,7 +129,6 @@ Add the following code below the require statement.
 ```php
 use Dite\Schema\Schema;
 use Dite\Model\Model;
-
 use Dite\Table\Table;
 
 
@@ -460,7 +458,7 @@ The updateMany method returns void.
 Static method delete will delete a record by it's id.
 
 ```php
-//updating the user where user_id = 1
+//deleting the user where user_id = 1
 $user = User::delete(1);
 ```
 
@@ -482,21 +480,21 @@ $user = User::deleteMany(["user_name"=>"tom", "age" => 30]);
 
 #### Counting the number of records that matcht the query.
 
-Static method countRecord() is used for Counting the number of records that match the query.
+Static method countRecords() is used for Counting the number of records that match the query.
 
 ```php
 //counting number the users where user_name = tom
-$user = User::countRecord();
+$user = User::countRecords();
 
 //updating the user where user_name = tom and age = 30
-$user = User::countRecord(["user_name"=>"tom", "age" => 30]);
+$user = User::countRecords(["user_name"=>"tom", "age" => 30]);
 ```
 
 ### Reading records from the database.
 
 This can be done using many methods which are all discussed below.
 All static methods that are used for reading records takes in atleast two optional parameters, the where clause array/int and the feilds you want back.
-The fields you want back can be passed as comma separated string value of the columns you want back **OR** as an array of all the feildsyou want back.As shown below
+The fields you want back can be passed as comma separated string value of the columns you want back **OR** as an array of all the feilds you want back. As shown below
  ```php
 //get all the records from the table user
 $user = User::all([], 'name, email');
@@ -640,8 +638,8 @@ Will sort the result in descending or asscending order . The values can be asc o
 
 ```php
 $user_instance = new User();
-$user = $user_instance->find()->orderBy(['user_id, name, created_at'])->get()
-//select * from user order by user_id asc name asc created_at asc.
+$user = $user_instance->find()->orderBy("user_id, name ASC, created_at DESC")->get()
+//select * from user order by user_id asc name asc created_at DESC.
 
 $user = $user_instance->find()->orderBy(['user_id'=> 'asc'])->get()
 //select * from user order by user_id desc.
@@ -649,7 +647,7 @@ $user = $user_instance->find()->orderBy(['user_id'=> 'asc'])->get()
 $user = $user_instance->find()->orderBy(['user_id'=> 'asc', 'name'=>'desc'])->get()
 //select * from user order by user_id desc age asc.
 
-$user = $user_instance->find(['name'=>'john'])->orderBy(['age'=>'asc'])->get()
+$user = $user_instance->find(['name'=>'john'])->orderBy('age asc')->get()
 //select * from user where name = john orderby age asc.
 ```
 
@@ -682,7 +680,8 @@ $users = $user->find()->select('name, age')->get()
 //select name, age from user.
 
 $users = $user->find()
-        ->select(['name as names_of_staffs', 'age',  "COUNT(name) * 2 as total"])->get()
+        ->select(['name as names_of_staffs', 'age',  "COUNT(name) * 2 as total"])
+        ->get()
 // 
 $users = $user
         ->find(['name'=>'john'])

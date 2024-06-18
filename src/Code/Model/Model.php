@@ -136,8 +136,12 @@ class Model{
         $maker = self::maker($where_selector);
         $deleted_record = true;
         // 
-        if(is_int($where_selector)||is_string($where_selector)){
+        if(is_int($where_selector) || is_string($where_selector)){
             $deleted_record = self::findById($where_selector);
+        }
+        // 
+        if(!$deleted_record){
+            return false;
         }
         $sql = "DELETE FROM $maker->table_name $maker->where";
         // 
@@ -445,7 +449,7 @@ class Model{
         foreach ($order_array as $key => $value) {
             if(is_int($key)){
                 //it is plain array
-                $this->order_by.=$i<count($order_array)?"ORDER BY $value, ":"ORDER BY $value";
+                $this->order_by.=$i < count($order_array)?"ORDER BY $value, ":"ORDER BY $value";
             }elseif(is_string($key)){
                 // associative array
                 $_value = strtoupper($value);
